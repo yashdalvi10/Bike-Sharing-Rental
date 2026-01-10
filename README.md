@@ -42,17 +42,13 @@ Final Performance:
 🚀 Deployment Ready
 
 - Streamlit App for user-friendly interaction
-
 - StandardScaler applied for consistent input scaling
-
 - Pickle (.pkl) model saved for inference
-
 - Docker support for easy cloud deployment
 
 
 
 🐳 Docker Support
-
 Docker allows:
 - Consistent environment across systems
 - Easy cloud deployment (AWS / Azure / GCP)
@@ -84,7 +80,7 @@ Docker allows:
 
 👨‍💻 Author
 
-Yash Dalvi
+Yash Dalvi.
 Machine Learning Developer
 - Mail: ydalvi565@gmail.com
 - Mobile No.: 8805946804
