@@ -7,6 +7,15 @@ Accurate demand forecasting helps bike rental companies optimize inventory, redu
 This project predicts the number of bike rentals based on time, weather, and engineered features.
 
 
+💻 Tech Stack
+| Category               | Tools & Libraries                                |
+| ---------------------- | ------------------------------------------------ |
+| 🐍 Language            | Python                                           |
+| 📚 Libraries           | Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn |
+| 🧰 Environment         | Jupyter Notebook                                 |
+| 🚀 Optional Deployment | Streamlit / Flask                                |
+
+
 🧠 Model Used
 Gradient Boosting Regressor (Tuned)
 Final Performance:
@@ -79,9 +88,6 @@ Docker allows:
 
 
 👨‍💻 Author
-
-Yash Dalvi
-
-Machine Learning Developer
-- Mail: ydalvi565@gmail.com
-- Mobile No.: 8805946804
+Yash R. Dalvi || ydalvi565@gmail.com
+📧 Data Science & Machine Learning Enthusiast.
+💼 Passionate about solving real-world problems using data.
