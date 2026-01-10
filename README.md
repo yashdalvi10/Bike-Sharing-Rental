@@ -4,3 +4,43 @@ An end-to-end machine learning regression project to predict bike rental demand 
 📌 Project Overview
 Accurate demand forecasting helps bike rental companies optimize inventory, reduce operational costs, and improve customer satisfaction.
 This project predicts the number of bike rentals based on time, weather, and engineered features.
+
+🧠 Model Used
+Gradient Boosting Regressor (Tuned)
+Final Performance:
+R² Score: 0.9356
+RMSE: 24.38
+MAE: 14.99
+
+🛠️ Feature Engineering
+✅ Final Features Used
+season, yr, holiday, workingday, weathersit,
+hum, windspeed,
+hour_sin, hour_cos,
+weekday_sin, weekday_cos,
+month_sin, month_cos,
+is_weekend,
+comfort_index,
+hour_type,
+temp_feel_gap,
+wind_temp_ratio
+Cyclical features (hour, weekday, month) are encoded using sin & cos transformation to preserve time continuity.
+
+
+📊 Visualizations Included
+
+📈 Actual vs Predicted plot
+📉 Residual error plot
+🧠 Feature importance plot
+📊 Confidence interval display
+
+
+🚀 Deployment Ready
+
+Streamlit App for user-friendly interaction
+
+StandardScaler applied for consistent input scaling
+
+Pickle (.pkl) model saved for inference
+
+Docker support for easy cloud deployment
