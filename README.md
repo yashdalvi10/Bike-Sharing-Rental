@@ -8,39 +8,38 @@ This project predicts the number of bike rentals based on time, weather, and eng
 🧠 Model Used
 Gradient Boosting Regressor (Tuned)
 Final Performance:
-R² Score: 0.9356
-RMSE: 24.38
-MAE: 14.99
+- R² Score: 0.9356
+- RMSE: 24.38
+- MAE: 14.99
 
 🛠️ Feature Engineering
 ✅ Final Features Used
-season, yr, holiday, workingday, weathersit,
-hum, windspeed,
-hour_sin, hour_cos,
-weekday_sin, weekday_cos,
-month_sin, month_cos,
-is_weekend,
-comfort_index,
-hour_type,
-temp_feel_gap,
-wind_temp_ratio
-Cyclical features (hour, weekday, month) are encoded using sin & cos transformation to preserve time continuity.
+- season, yr, holiday, workingday, weathersit,
+- hum, windspeed,
+- hour_sin, hour_cos,
+- weekday_sin, weekday_cos,
+- month_sin, month_cos,
+- is_weekend,
+- comfort_index,
+- hour_type,
+- temp_feel_gap,
+- wind_temp_ratio
 
 
 📊 Visualizations Included
 
-📈 Actual vs Predicted plot
-📉 Residual error plot
-🧠 Feature importance plot
-📊 Confidence interval display
+- 📈 Actual vs Predicted plot
+- 📉 Residual error plot
+- 🧠 Feature importance plot
+- 📊 Confidence interval display
 
 
 🚀 Deployment Ready
 
-Streamlit App for user-friendly interaction
+- Streamlit App for user-friendly interaction
 
-StandardScaler applied for consistent input scaling
+- StandardScaler applied for consistent input scaling
 
-Pickle (.pkl) model saved for inference
+- Pickle (.pkl) model saved for inference
 
-Docker support for easy cloud deployment
+- Docker support for easy cloud deployment
