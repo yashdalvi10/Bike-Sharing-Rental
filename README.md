@@ -80,7 +80,8 @@ Docker allows:
 
 👨‍💻 Author
 
-Yash Dalvi.
+Yash Dalvi
+
 Machine Learning Developer
 - Mail: ydalvi565@gmail.com
 - Mobile No.: 8805946804
