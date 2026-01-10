@@ -1,171 +1,137 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "769231f6-57fc-4c3c-827f-b21b52d653af",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import streamlit as st\n",
-    "import numpy as np\n",
-    "import pandas as pd\n",
-    "import joblib\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Page Config\n",
-    "# -----------------------------\n",
-    "st.set_page_config(\n",
-    "    page_title=\"Bike Demand Prediction\",\n",
-    "    page_icon=\"🚲\",\n",
-    "    layout=\"centered\"\n",
-    ")\n",
-    "\n",
-    "st.title(\"🚲 Bike Rental Demand Prediction\")\n",
-    "st.markdown(\"Predict hourly bike demand using weather & time inputs\")\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Load Model & Scaler\n",
-    "# -----------------------------\n",
-    "model = joblib.load(\"model.pkl\")\n",
-    "scaler = joblib.load(\"scaler.pkl\")\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Mappings (User Friendly)\n",
-    "# -----------------------------\n",
-    "season_map = {\n",
-    "    \"Spring\": 1,\n",
-    "    \"Summer\": 2,\n",
-    "    \"Fall\": 3,\n",
-    "    \"Winter\": 4\n",
-    "}\n",
-    "\n",
-    "weather_map = {\n",
-    "    \"Clear / Few clouds\": 1,\n",
-    "    \"Mist / Cloudy\": 2,\n",
-    "    \"Light Snow / Rain\": 3,\n",
-    "    \"Heavy Rain / Snow\": 4\n",
-    "}\n",
-    "\n",
-    "binary_map = {\"No\": 0, \"Yes\": 1}\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Sidebar Inputs\n",
-    "# -----------------------------\n",
-    "st.sidebar.header(\"📌 Input Parameters\")\n",
-    "\n",
-    "date = st.sidebar.date_input(\"Select Date\")\n",
-    "hour = st.sidebar.slider(\"Hour of Day\", 0, 23, 12)\n",
-    "\n",
-    "season_label = st.sidebar.selectbox(\"Season\", list(season_map.keys()))\n",
-    "weather_label = st.sidebar.selectbox(\"Weather Condition\", list(weather_map.keys()))\n",
-    "\n",
-    "holiday_label = st.sidebar.selectbox(\"Holiday\", list(binary_map.keys()))\n",
-    "workingday_label = st.sidebar.selectbox(\"Working Day\", list(binary_map.keys()))\n",
-    "\n",
-    "temp = st.sidebar.number_input(\"Temperature (°C)\", 0.0, 50.0, 25.0)\n",
-    "atemp = st.sidebar.number_input(\"Feels Like Temperature (°C)\", 0.0, 50.0, 24.0)\n",
-    "hum = st.sidebar.slider(\"Humidity (%)\", 0, 100, 60)\n",
-    "windspeed = st.sidebar.slider(\"Wind Speed (km/h)\", 0.0, 50.0, 10.0)\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Convert User Inputs\n",
-    "# -----------------------------\n",
-    "season = season_map[season_label]\n",
-    "weathersit = weather_map[weather_label]\n",
-    "holiday = binary_map[holiday_label]\n",
-    "workingday = binary_map[workingday_label]\n",
-    "\n",
-    "weekday = date.weekday()\n",
-    "month = date.month\n",
-    "yr = date.year - 2011  # same encoding as training\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Feature Engineering\n",
-    "# -----------------------------\n",
-    "hour_sin = np.sin(2 * np.pi * hour / 24)\n",
-    "hour_cos = np.cos(2 * np.pi * hour / 24)\n",
-    "\n",
-    "weekday_sin = np.sin(2 * np.pi * weekday / 7)\n",
-    "weekday_cos = np.cos(2 * np.pi * weekday / 7)\n",
-    "\n",
-    "month_sin = np.sin(2 * np.pi * month / 12)\n",
-    "month_cos = np.cos(2 * np.pi * month / 12)\n",
-    "\n",
-    "is_weekend = 1 if weekday >= 5 else 0\n",
-    "temp_feel_gap = abs(temp - atemp)\n",
-    "comfort_index = (1 - temp_feel_gap) * (1 - hum / 100)\n",
-    "wind_temp_ratio = windspeed / (temp + 1)\n",
-    "\n",
-    "def hour_type_fn(hr):\n",
-    "    if 7 <= hr <= 9 or 17 <= hr <= 19:\n",
-    "        return 2   # Peak\n",
-    "    elif 10 <= hr <= 16:\n",
-    "        return 1   # Normal\n",
-    "    else:\n",
-    "        return 0   # Off-peak\n",
-    "\n",
-    "hour_type = hour_type_fn(hour)\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Final Feature Vector\n",
-    "# -----------------------------\n",
-    "X = pd.DataFrame([[\n",
-    "    season, yr, holiday, workingday, weathersit,\n",
-    "    hum, windspeed,\n",
-    "    hour_sin, hour_cos,\n",
-    "    weekday_sin, weekday_cos,\n",
-    "    month_sin, month_cos,\n",
-    "    is_weekend,\n",
-    "    comfort_index, hour_type, temp_feel_gap, wind_temp_ratio\n",
-    "]], columns=[\n",
-    "    \"season\", \"yr\", \"holiday\", \"workingday\", \"weathersit\",\n",
-    "    \"hum\", \"windspeed\", \"hour_sin\", \"hour_cos\",\n",
-    "    \"weekday_sin\", \"weekday_cos\", \"month_sin\", \"month_cos\",\n",
-    "    \"is_weekend\", \"comfort_index\", \"hour_type\",\n",
-    "    \"temp_feel_gap\", \"wind_temp_ratio\"\n",
-    "])\n",
-    "\n",
-    "# Scale\n",
-    "X_scaled = scaler.transform(X)\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Prediction\n",
-    "# -----------------------------\n",
-    "st.markdown(\"---\")\n",
-    "if st.button(\"🔮 Predict Bike Demand\"):\n",
-    "    prediction = model.predict(X_scaled)[0]\n",
-    "    st.success(f\"🚴 Estimated Bike Demand: **{int(prediction)} bikes**\")\n",
-    "\n",
-    "    st.info(\"Prediction is based on historical trends, weather conditions, and time-based patterns.\")\n",
-    "\n",
-    "# -----------------------------\n",
-    "# Footer\n",
-    "# -----------------------------\n",
-    "st.markdown(\"---\")\n",
-    "st.caption(\"📊 Powered by Gradient Boosting Regression | Feature Engineered ML Model\")\n"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.12.4"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
+import streamlit as st
+import numpy as np
+import pandas as pd
+import joblib
+
+# -----------------------------
+# Page Config
+# -----------------------------
+st.set_page_config(
+    page_title="Bike Demand Prediction",
+    page_icon="🚲",
+    layout="centered"
+)
+
+st.title("🚲 Bike Rental Demand Prediction")
+st.markdown("Predict hourly bike demand using weather & time inputs")
+
+# -----------------------------
+# Load Model & Scaler
+# -----------------------------
+model = joblib.load("model.pkl")
+scaler = joblib.load("scaler.pkl")
+
+# -----------------------------
+# Mappings (User Friendly)
+# -----------------------------
+season_map = {
+    "Spring": 1,
+    "Summer": 2,
+    "Fall": 3,
+    "Winter": 4
 }
+
+weather_map = {
+    "Clear / Few clouds": 1,
+    "Mist / Cloudy": 2,
+    "Light Snow / Rain": 3,
+    "Heavy Rain / Snow": 4
+}
+
+binary_map = {"No": 0, "Yes": 1}
+
+# -----------------------------
+# Sidebar Inputs
+# -----------------------------
+st.sidebar.header("📌 Input Parameters")
+
+date = st.sidebar.date_input("Select Date")
+hour = st.sidebar.slider("Hour of Day", 0, 23, 12)
+
+season_label = st.sidebar.selectbox("Season", list(season_map.keys()))
+weather_label = st.sidebar.selectbox("Weather Condition", list(weather_map.keys()))
+
+holiday_label = st.sidebar.selectbox("Holiday", list(binary_map.keys()))
+workingday_label = st.sidebar.selectbox("Working Day", list(binary_map.keys()))
+
+temp = st.sidebar.number_input("Temperature (°C)", 0.0, 50.0, 25.0)
+atemp = st.sidebar.number_input("Feels Like Temperature (°C)", 0.0, 50.0, 24.0)
+hum = st.sidebar.slider("Humidity (%)", 0, 100, 60)
+windspeed = st.sidebar.slider("Wind Speed (km/h)", 0.0, 50.0, 10.0)
+
+# -----------------------------
+# Convert User Inputs
+# -----------------------------
+season = season_map[season_label]
+weathersit = weather_map[weather_label]
+holiday = binary_map[holiday_label]
+workingday = binary_map[workingday_label]
+
+weekday = date.weekday()
+month = date.month
+yr = date.year - 2011  # same encoding as training
+
+# -----------------------------
+# Feature Engineering
+# -----------------------------
+hour_sin = np.sin(2 * np.pi * hour / 24)
+hour_cos = np.cos(2 * np.pi * hour / 24)
+
+weekday_sin = np.sin(2 * np.pi * weekday / 7)
+weekday_cos = np.cos(2 * np.pi * weekday / 7)
+
+month_sin = np.sin(2 * np.pi * month / 12)
+month_cos = np.cos(2 * np.pi * month / 12)
+
+is_weekend = 1 if weekday >= 5 else 0
+temp_feel_gap = abs(temp - atemp)
+comfort_index = (1 - temp_feel_gap) * (1 - hum / 100)
+wind_temp_ratio = windspeed / (temp + 1)
+
+def hour_type_fn(hr):
+    if 7 <= hr <= 9 or 17 <= hr <= 19:
+        return 2   # Peak
+    elif 10 <= hr <= 16:
+        return 1   # Normal
+    else:
+        return 0   # Off-peak
+
+hour_type = hour_type_fn(hour)
+
+# -----------------------------
+# Final Feature Vector
+# -----------------------------
+X = pd.DataFrame([[
+    season, yr, holiday, workingday, weathersit,
+    hum, windspeed,
+    hour_sin, hour_cos,
+    weekday_sin, weekday_cos,
+    month_sin, month_cos,
+    is_weekend,
+    comfort_index, hour_type, temp_feel_gap, wind_temp_ratio
+]], columns=[
+    "season", "yr", "holiday", "workingday", "weathersit",
+    "hum", "windspeed", "hour_sin", "hour_cos",
+    "weekday_sin", "weekday_cos", "month_sin", "month_cos",
+    "is_weekend", "comfort_index", "hour_type",
+    "temp_feel_gap", "wind_temp_ratio"
+])
+
+# Scale
+X_scaled = scaler.transform(X)
+
+# -----------------------------
+# Prediction
+# -----------------------------
+st.markdown("---")
+if st.button("🔮 Predict Bike Demand"):
+    prediction = model.predict(X_scaled)[0]
+    st.success(f"🚴 Estimated Bike Demand: **{int(prediction)} bikes**")
+
+    st.info("Prediction is based on historical trends, weather conditions, and time-based patterns.")
+
+# -----------------------------
+# Footer
+# -----------------------------
+st.markdown("---")
+st.caption("📊 Powered by Gradient Boosting Regression | Feature Engineered ML Model")
