@@ -3,9 +3,7 @@ import numpy as np
 import pandas as pd
 import joblib
 
-# -----------------------------
-# Page Config
-# -----------------------------
+
 st.set_page_config(
     page_title="Bike Demand Prediction",
     page_icon="🚲",
@@ -15,15 +13,11 @@ st.set_page_config(
 st.title("🚲 Bike Rental Demand Prediction")
 st.markdown("Predict hourly bike demand using weather & time inputs")
 
-# -----------------------------
-# Load Model & Scaler
-# -----------------------------
+
 model = joblib.load("model.pkl")
 scaler = joblib.load("scaler.pkl")
 
-# -----------------------------
-# Mappings (User Friendly)
-# -----------------------------
+
 season_map = {
     "Spring": 1,
     "Summer": 2,
@@ -40,9 +34,7 @@ weather_map = {
 
 binary_map = {"No": 0, "Yes": 1}
 
-# -----------------------------
-# Sidebar Inputs
-# -----------------------------
+
 st.sidebar.header("📌 Input Parameters")
 
 date = st.sidebar.date_input("Select Date")
@@ -59,9 +51,8 @@ atemp = st.sidebar.number_input("Feels Like Temperature (°C)", 0.0, 50.0, 24.0)
 hum = st.sidebar.slider("Humidity (%)", 0, 100, 60)
 windspeed = st.sidebar.slider("Wind Speed (km/h)", 0.0, 50.0, 10.0)
 
-# -----------------------------
-# Convert User Inputs
-# -----------------------------
+
+
 season = season_map[season_label]
 weathersit = weather_map[weather_label]
 holiday = binary_map[holiday_label]
@@ -69,11 +60,9 @@ workingday = binary_map[workingday_label]
 
 weekday = date.weekday()
 month = date.month
-yr = date.year - 2011  # same encoding as training
+yr = date.year - 2011  
 
-# -----------------------------
-# Feature Engineering
-# -----------------------------
+
 hour_sin = np.sin(2 * np.pi * hour / 24)
 hour_cos = np.cos(2 * np.pi * hour / 24)
 
@@ -90,17 +79,15 @@ wind_temp_ratio = windspeed / (temp + 1)
 
 def hour_type_fn(hr):
     if 7 <= hr <= 9 or 17 <= hr <= 19:
-        return 2   # Peak
+        return 2   
     elif 10 <= hr <= 16:
-        return 1   # Normal
+        return 1   
     else:
-        return 0   # Off-peak
+        return 0  
 
 hour_type = hour_type_fn(hour)
 
-# -----------------------------
-# Final Feature Vector
-# -----------------------------
+
 X = pd.DataFrame([[
     season, yr, holiday, workingday, weathersit,
     hum, windspeed,
@@ -117,12 +104,10 @@ X = pd.DataFrame([[
     "temp_feel_gap", "wind_temp_ratio"
 ])
 
-# Scale
+
 X_scaled = scaler.transform(X)
 
-# -----------------------------
-# Prediction
-# -----------------------------
+
 st.markdown("---")
 if st.button("🔮 Predict Bike Demand"):
     prediction = model.predict(X_scaled)[0]
@@ -130,8 +115,6 @@ if st.button("🔮 Predict Bike Demand"):
 
     st.info("Prediction is based on historical trends, weather conditions, and time-based patterns.")
 
-# -----------------------------
-# Footer
-# -----------------------------
+
 st.markdown("---")
 st.caption("📊 Powered by Gradient Boosting Regression | Feature Engineered ML Model")
