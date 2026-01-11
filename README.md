@@ -3,7 +3,10 @@ An end-to-end machine learning regression project to predict bike rental demand 
 
 
 📌 Project Overview
-Accurate demand forecasting helps bike rental companies optimize inventory, reduce operational costs, and improve customer satisfaction.
+Accurate demand forecasting helps bike rental companies:
+- Optimize bike availability
+- Reduce operational costs
+- Improve customer satisfaction
 This project predicts the number of bike rentals based on time, weather, and engineered features.
 
 
@@ -68,7 +71,7 @@ Final Performance:
 2️⃣ Run Streamlit app
 - streamlit run app.py
 
-🐳 Run Using Docker
+🐳 Run Using Docker(Optional)
 - docker build -t bike-demand-app .
 - docker run -p 8501:8501 bike-demand-app
 
