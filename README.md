@@ -53,15 +53,11 @@ Final Performance:
 - Streamlit App for user-friendly interaction
 - StandardScaler applied for consistent input scaling
 - Pickle (.pkl) model saved for inference
-- Docker support for easy cloud deployment
 
 
+🐳 Docker: Optional (can be enabled for containerized cloud deployment)
 
-🐳 Docker Support
-Docker allows:
-- Consistent environment across systems
-- Easy cloud deployment (AWS / Azure / GCP)
-- Fast setup with zero dependency issues
+
 
 
 ▶️ How to Run Locally
